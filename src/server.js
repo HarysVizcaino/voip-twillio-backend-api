@@ -21,6 +21,7 @@ function tokenGenerator(request, response) {
   if (request.method == 'POST') {
     identity = request.body.identity;
   } else {
+    console.log('IDENTITY', request.query.identity);
     identity = request.query.identity;
   }
 
@@ -50,7 +51,9 @@ function tokenGenerator(request, response) {
   token.addGrant(voiceGrant);
   token.identity = identity;
   console.log('Token:' + token.toJwt());
-  return response.send(token.toJwt());
+  return response.send({
+    token: token.toJwt(),
+  });
 }
 
 /**
@@ -66,17 +69,19 @@ function tokenGenerator(request, response) {
  * @returns {Object} - The Response Object with TwiMl, used to respond to an outgoing call
  */
 function makeCall(request, response) {
+  console.log(JSON.stringify(request.body.to));
   // The recipient of the call, a phone number or a client
   var to = null;
   if (request.method == 'POST') {
-    to = request.body.to;
+    to = request.body.To;
   } else {
-    to = request.query.to;
+    to = request.query.To;
   }
 
   const voiceResponse = new VoiceResponse();
 
   if (!to) {
+    console.log('WHY HERE');
       voiceResponse.say("Congratulations! You have made your first call! Good bye.");
   } else if (isNumber(to)) {
       const dial = voiceResponse.dial({callerId : callerNumber});
